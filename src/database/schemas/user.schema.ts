@@ -15,10 +15,6 @@ export class User extends Document {
 
   @Prop()
   country: string;
-
-  async comparePassword(enteredPassword: string): Promise<boolean> {
-    return bcrypt.compare(enteredPassword, this.password);
-  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -30,6 +26,21 @@ UserSchema.pre('save', async function (next) {
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+
+  next();
+});
+
+UserSchema.pre('findOneAndUpdate', async function (next) {
+  const update = this.getUpdate();
+
+  if (update && typeof (update as any).password === 'string') {
+    const salt = await bcrypt.genSalt(10);
+    (update as any).password = await bcrypt.hash(
+      (update as any).password,
+      salt,
+    );
+    this.setUpdate(update);
+  }
 
   next();
 });
