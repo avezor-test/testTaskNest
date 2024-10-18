@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -10,6 +10,7 @@ import { DeadTokenService } from './dead-token.service';
 import { AuthController } from './auth.controller';
 import { DeadTokenGuard } from './jwt/dead-token.guard';
 
+@Global()
 @Module({
   imports: [
     UserModule,
@@ -26,6 +27,6 @@ import { DeadTokenGuard } from './jwt/dead-token.guard';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, DeadTokenService, DeadTokenGuard],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule, DeadTokenService, DeadTokenGuard],
 })
 export class AuthModule {}

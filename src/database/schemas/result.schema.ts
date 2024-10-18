@@ -4,10 +4,19 @@ import { Document } from 'mongoose';
 @Schema()
 export class Result extends Document {
   @Prop({ required: true })
-  score: number;
+  email: string;
 
   @Prop({ required: true })
-  userId: string; // Reference to User
+  country: string;
+
+  @Prop({ required: true })
+  city: string;
+
+  @Prop({ required: true })
+  isCorrect: boolean;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
 export const ResultSchema = SchemaFactory.createForClass(Result);

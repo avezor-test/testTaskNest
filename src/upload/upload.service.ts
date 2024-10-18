@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Country } from 'src/database/schemas/country.schema';
+import { RandomCountryCityDto } from './dto/random-country.dto';
 
 @Injectable()
 export class UploadService {
@@ -37,7 +38,7 @@ export class UploadService {
       }
     }
   }
-  async getRandomCountry(): Promise<{ country: string; city: string }[]> {
+  async getRandomCountry(): Promise<RandomCountryCityDto[]> {
     const countries = await this.countryModel.find().exec();
     const cities = countries.map((item) => item.city);
 

@@ -8,17 +8,21 @@ import {
   ApiUploadJsonFile,
 } from 'decorators/api/upload.decorators';
 import { ApiTags } from '@nestjs/swagger';
+import { DeadTokenGuard } from 'src/auth/jwt/dead-token.guard';
+import { RandomCountryCityDto } from './dto/random-country.dto';
 
 @ApiTags('Upload')
 @Controller('upload')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, DeadTokenGuard)
 export class UploadController {
   constructor(private uploadService: UploadService) {}
 
   @Post('json')
   @UploadJsonFile()
   @ApiUploadJsonFile()
-  async uploadJsonFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadJsonFile(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<{ message: string }> {
     if (!file) {
       throw new Error('File upload failed');
     }
@@ -35,7 +39,7 @@ export class UploadController {
 
   @Get('countries')
   @ApiGetRandomCountry()
-  async getRandomCountryCity() {
+  async getRandomCountryCity(): Promise<RandomCountryCityDto[]> {
     return this.uploadService.getRandomCountry();
   }
 }

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { Result } from './result.schema';
 
 @Schema()
 export class User extends Document {
@@ -15,9 +16,20 @@ export class User extends Document {
 
   @Prop()
   country: string;
+
+  results: Result[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.virtual('results', {
+  ref: 'Result',
+  localField: 'email',
+  foreignField: 'email',
+});
+
+UserSchema.set('toObject', { virtuals: true });
+UserSchema.set('toJSON', { virtuals: true });
 
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {

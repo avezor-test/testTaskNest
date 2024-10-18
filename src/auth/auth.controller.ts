@@ -18,6 +18,7 @@ import {
 } from 'decorators/api/auth.decorators';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { DeadTokenGuard } from './jwt/dead-token.guard';
+import { CheckUserMatch } from 'decorators/checkUserMatch.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -26,13 +27,16 @@ export class AuthController {
 
   @Post('register')
   @ApiRegister()
-  async register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ message: string }> {
+    await this.authService.register(createUserDto);
+    return { message: 'User successfully registered' };
   }
 
   @Post('login')
   @ApiLogin()
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto): Promise<{ access_token: string }> {
     const { email, password } = loginDto;
     const user = await this.authService.validateUser(email, password);
     if (!user) {
@@ -44,13 +48,18 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, DeadTokenGuard)
   @Post('logout')
   @ApiLogout()
-  async logout(@Req() req: Request, @Body('email') email: string) {
+  async logout(
+    @Req() req: Request,
+    @Body('email') email: string,
+    @CheckUserMatch() _: void,
+  ): Promise<{ message: string }> {
     const authorization = req.headers['authorization'];
     if (!authorization) {
       throw new UnauthorizedException('Authorization header not found');
     }
     const token = authorization.split(' ')[1];
-    return this.authService.logout(email, token);
+    await this.authService.logout(email, token);
+    return { message: 'Successful logout' };
   }
 
   @UseGuards(JwtAuthGuard, DeadTokenGuard)
@@ -59,7 +68,9 @@ export class AuthController {
   async changePassword(
     @Body('newPassword') newPassword: string,
     @Body('email') email: string,
-  ) {
-    return this.authService.changePassword(email, newPassword);
+    @CheckUserMatch() _: void,
+  ): Promise<{ message: string }> {
+    await this.authService.changePassword(email, newPassword);
+    return { message: 'Password successfully changed' };
   }
 }
