@@ -15,7 +15,7 @@ import {
   ApiLogin,
   ApiLogout,
   ApiRegister,
-} from 'decorators/auth.decorators';
+} from 'decorators/api/auth.decorators';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { DeadTokenGuard } from './jwt/dead-token.guard';
 
