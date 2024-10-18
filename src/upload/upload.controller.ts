@@ -1,17 +1,20 @@
-import { Controller, Post, UseGuards, UploadedFile } from '@nestjs/common';
+import { Controller, Post, UseGuards, UploadedFile, Get } from '@nestjs/common';
 import { JwtAuthGuard } from '../../src/auth/jwt/jwt-auth.guard';
 import { UploadService } from './upload.service';
 import * as fs from 'fs';
 import { UploadJsonFile } from 'decorators/upload-json.decorator';
-import { ApiUploadJsonFile } from 'decorators/api/upload.decorators';
+import {
+  ApiGetRandomCountry,
+  ApiUploadJsonFile,
+} from 'decorators/api/upload.decorators';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Upload')
 @Controller('upload')
+@UseGuards(JwtAuthGuard)
 export class UploadController {
   constructor(private uploadService: UploadService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post('json')
   @UploadJsonFile()
   @ApiUploadJsonFile()
@@ -28,5 +31,11 @@ export class UploadController {
     await this.uploadService.saveCountries(data);
 
     return { message: 'File uploaded and processed successfully' };
+  }
+
+  @Get('countries')
+  @ApiGetRandomCountry()
+  async getRandomCountryCity() {
+    return this.uploadService.getRandomCountry();
   }
 }

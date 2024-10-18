@@ -39,3 +39,21 @@ export function ApiUploadJsonFile() {
     }),
   );
 }
+
+export function ApiGetRandomCountry() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get random countries with shuffled cities',
+      description:
+        'Returns a list of countries with randomly shuffled cities, ensuring that a country never has its original city.',
+    }),
+    ApiBearerAuth(),
+    ApiResponse({
+      status: 200,
+      description:
+        'Successfully returned list of countries with shuffled cities',
+    }),
+    ApiResponse({ status: 401, description: 'Unauthorized' }),
+    ApiResponse({ status: 500, description: 'Internal Server Error' }),
+  );
+}

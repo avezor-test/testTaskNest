@@ -6,7 +6,7 @@ export class Country extends Document {
   @Prop({ required: true })
   country: string;
 
-  @Prop({ required: true })
+  @Prop()
   city: string;
 }
 
