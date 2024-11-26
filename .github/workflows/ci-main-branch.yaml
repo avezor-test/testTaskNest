@@ -1,0 +1,48 @@
+name: Main branch build
+
+env:
+  #  NODE_ENV: 'production'
+  REPOSITORY:
+
+on:
+  push:
+    branches:
+      - main
+#    paths:
+#      - apps/**
+#      - libs/**
+#      - "*.json"
+#      - yarn.lock
+#      - "jest.*"
+#      - .github/workflows/ci-main-branch.yaml
+#      - Dockerfile
+
+concurrency: ci-main-branch
+
+jobs:
+  build-docker-image:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set image tag
+        id: tag
+        run: echo "image_tag=main-$(date +'%Y%m%d%H%M%S')-$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build, tag, and push image
+        id: build-image
+        uses: docker/build-push-action@v6
+        timeout-minutes: 15
+        with:
+          platforms: |
+            linux/amd64
+          file: ${{ github.workspace }}/Dockerfile
+          context: ${{ github.workspace }}
+          push: true
+          tags: |
+            ${{env.REPOSITORY}}:${{ steps.tag.outputs.image_tag }}
