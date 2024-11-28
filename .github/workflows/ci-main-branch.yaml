@@ -22,7 +22,7 @@ concurrency: ci-main-branch
 jobs:
   build-docker-image:
     name: Build Docker image
-    runs-on: ubuntu-latest
+    runs-on: Self-hosted
     steps:
       - name: Set image tag
         id: tag
