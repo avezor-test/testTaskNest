@@ -1,48 +1,41 @@
-name: Main branch build
+name: Publish Docker image
 
 env:
   #  NODE_ENV: 'production'
-  REPOSITORY:
+  REPOSITORY: erickartman/testtasknest
 
 on:
   push:
     branches:
       - main
-#    paths:
-#      - apps/**
-#      - libs/**
-#      - "*.json"
-#      - yarn.lock
-#      - "jest.*"
-#      - .github/workflows/ci-main-branch.yaml
-#      - Dockerfile
-
-concurrency: ci-main-branch
 
 jobs:
-  build-docker-image:
-    name: Build Docker image
-    runs-on: Self-hosted
+  build-and-push:
+    runs-on: self-hosted
     steps:
       - name: Set image tag
         id: tag
         run: echo "image_tag=main-$(date +'%Y%m%d%H%M%S')-$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
-
-      - name: Checkout code
-        uses: actions/checkout@v4
+      
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v1
 
-      - name: Build, tag, and push image
-        id: build-image
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
         uses: docker/build-push-action@v6
-        timeout-minutes: 15
         with:
           platforms: |
             linux/amd64
-          file: ${{ github.workspace }}/Dockerfile
-          context: ${{ github.workspace }}
+          context: .
+          file: ./Dockerfile
           push: true
           tags: |
             ${{env.REPOSITORY}}:${{ steps.tag.outputs.image_tag }}
