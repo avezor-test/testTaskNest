@@ -11,12 +11,12 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: self-hosted
+#    runs-on: self-hosted
     steps:
       - name: Set image tag
         id: tag
         run: echo "image_tag=main-$(date +'%Y%m%d%H%M%S')-$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
-      
+  
       - name: Checkout
         uses: actions/checkout@v2
 
